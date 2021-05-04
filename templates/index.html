@@ -1,0 +1,39 @@
+<head>
+<script>
+
+	function myfunc() {document.getElementById('message').innerHTML="I really hope to join you"};
+
+</script>
+</head>
+
+
+<H1>Dear Radu, Congratulations! </H1>
+
+
+<p>In case you wonder what this is, it is my feeble attempt at a POC of a coherrent technology stack that in principle enables me to exploit - but primarily to grasp - a tiny bit of the potential to be found in cloud computing.</p>
+
+<p>With all of this starting with a seed from you, you probably understand that when I learned that you were leaving, I rushed to create a personal github account in which I could create a repository with this app.
+It is clearly not the most sophisticated app, but that wasn't the purpose either</p>
+
+<p>I then wrote a cloudformation script in my personal AWS account. The cloudformation script creates a VPC and a subnet, into which I launch an EC2 instance. On that EC2 instance, the cloudformation script installs Python3 and git, and when it is done doing that, it clones the repository onto an EC2 instance (which is btw equipped with a rather relaxed security group, I skipped the NACL, but I have worked with that too). Finally, the cloudformation script launches the flask app (not production grade, I'm not there. Yet...) so that it is hosted by the EC2 instance I just created. As you obviously know, all of this is totally independent of anything anyone else needed to do for me to get going. Not that I don't want to collaborate with others, but it is gratifying to be able to solve some basic problems on my own</p>
+
+
+<p>You are clearly one of the most inspiring people I have ever come across - Leo Pharma should consider themselves fortunate to have you on board - I at least consider myself fortunate to have been working with you</p>
+
+<p>Thank you for opening my eyes to the world of data!</p>
+<p>Rest assured, you'll be sorely missed </p>
+
+</h2>I wish you all the best at Leo Pharma, and if you click below...</h2>
+
+<br>
+<br>
+
+<button onClick=myfunc()>Press here</button>
+
+<div id='message'></div>
+
+
+
+
+
+
