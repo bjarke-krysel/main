@@ -63,8 +63,8 @@
 		"Type": "AWS::EC2::Instance",
 		"Metadata": {
 			"AWS::CloudFormation::Init" : {
-				"configSets": {"simpelfil": ["Aha"]},
-				"Aha": {
+				"configSets": {"myConfigSet": ["myConfig"]},
+				"myConfig": {
 				"packages": {"yum": {
 					"python3-pip" : [],
 					"git": []}
@@ -96,13 +96,14 @@
 				"/opt/aws/bin/cfn-init -v",
 				"    --stack ", {"Ref" : "AWS::StackName"},
 				"    --resource myEC2 ",
-				"    --configsets simpelfil ",
+				"    --configsets myConfigSet ",
 				"    --region ", {"Ref" : "AWS::Region"}, "\n",
 				"mkdir /home/ec2-user/maindir", "\n",
 				"cd /home/ec2-user/maindir", "\n",
 				"git clone https://github.com/bjarke-krysel/main", "\n",
 				"pip3 install flask", "\n",
-				"cd main", "\n",
+				"cd main", "\n", "\n",
+				"pip3 install jupyter", "\n",
 				"python3 -m app"
 			]]}}
 		}
@@ -111,7 +112,7 @@
 "Outputs": {
 	"myOutputs": {
 		"Value": {"Fn::GetAtt": ["myEC2", "PrivateIp"]},
-		"Description": "This is the public IP"
+		"Description": "This is the private IP"
 		}
 	}
 }
