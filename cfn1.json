@@ -1,0 +1,117 @@
+{"Resources": {
+	"myVpc": {
+		"Type": "AWS::EC2::VPC",
+		"Properties": {
+			"CidrBlock": "10.0.0.0/16"
+		}
+	},
+	"myInternetGateway": {
+		"Type": "AWS::EC2::InternetGateway"
+	},
+	"myAttachGateway": {
+		"Type": "AWS::EC2::VPCGatewayAttachment",
+		"Properties": {
+			"VpcId": {"Ref": "myVpc"},
+			"InternetGatewayId": {"Ref": "myInternetGateway"}
+		}
+	},
+
+	"mySubnet": {
+		"Type": "AWS::EC2::Subnet",
+		"Properties": {
+			"CidrBlock": "10.0.0.0/24",
+			"AvailabilityZone": "eu-north-1a",
+			"VpcId": {"Ref" : "myVpc"},
+			"MapPublicIpOnLaunch": "true"
+		}
+	},
+	"mySecurityGroup": {
+		"Type": "AWS::EC2::SecurityGroup",
+		"Properties":{  	
+			"GroupDescription": "Everybody has access", 
+			"SecurityGroupIngress": [{"CidrIp": "0.0.0.0/0", "FromPort":"22", "ToPort": "22", "IpProtocol": "tcp"},
+				{"CidrIp": "0.0.0.0/0", "FromPort":"80", "ToPort": "80", "IpProtocol": "tcp"},
+				{"CidrIp": "0.0.0.0/0", "FromPort":"5001", "ToPort": "5001", "IpProtocol": "tcp"}],	
+			"VpcId": {"Ref": "myVpc"}
+		}
+	},
+
+	"myRouteTable": {
+		"Type": "AWS::EC2::RouteTable",
+		"Properties": {
+			"VpcId": {"Ref": "myVpc"}
+		}
+	},
+	"myInternetRoute": {
+		"Type": "AWS::EC2::Route",
+		"DependsOn": "myInternetGateway",
+		"Properties": {
+			"DestinationCidrBlock": "0.0.0.0/0",
+			"GatewayId": {"Ref": "myInternetGateway"},
+			"RouteTableId": {"Ref": "myRouteTable"}
+		}
+	},
+	"mySubnetRouteTableAssociation": {
+		"Type": "AWS::EC2::SubnetRouteTableAssociation",
+		"Properties": {
+			"RouteTableId": {"Ref": "myRouteTable"},
+			"SubnetId": {"Ref": "mySubnet"}
+		}
+	},	
+
+	"myEC2": {
+		"Type": "AWS::EC2::Instance",
+		"Metadata": {
+			"AWS::CloudFormation::Init" : {
+				"configSets": {"simpelfil": ["Aha"]},
+				"Aha": {
+				"packages": {"yum": {
+					"python3-pip" : [],
+					"git": []}
+				},
+				"commands": {					
+					"01_command": {
+						"command": "echo some_text > /home/ec2-user/tjuhej.txt"}
+				}						
+				,
+				"files": {
+					"/home/ec2-user/new_dir/jubii.txt": {
+							"content": "Hello world",
+							"mode": "000600",
+							"owner": "root",
+							"group": "root"}
+				}
+				}
+			}
+		},
+		
+		"Properties": {
+			"ImageId": "ami-02baf2b4223a343e8",
+			"InstanceType": "t3.micro",
+			"SecurityGroupIds": [{"Ref": "mySecurityGroup"}],
+			"SubnetId": {"Ref" : "mySubnet"},
+			"KeyName": "1903_ubuntu",
+			"UserData": {"Fn::Base64": {"Fn::Join": ["", [
+				"#!/bin/bash \n",				
+				"/opt/aws/bin/cfn-init -v",
+				"    --stack ", {"Ref" : "AWS::StackName"},
+				"    --resource myEC2 ",
+				"    --configsets simpelfil ",
+				"    --region ", {"Ref" : "AWS::Region"}, "\n",
+				"mkdir /home/ec2-user/maindir", "\n",
+				"cd /home/ec2-user/maindir", "\n",
+				"git clone https://github.com/bjarke-krysel/main", "\n",
+				"pip3 install flask", "\n",
+				"cd main", "\n",
+				"python3 -m app"
+			]]}}
+		}
+	}
+},
+"Outputs": {
+	"myOutputs": {
+		"Value": {"Fn::GetAtt": ["myEC2", "PrivateIp"]},
+		"Description": "This is the public IP"
+		}
+	}
+}
